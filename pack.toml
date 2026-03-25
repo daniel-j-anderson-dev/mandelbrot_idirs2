@@ -1,0 +1,10 @@
+[custom.all.mandelbrot]
+type = "local"
+path = "."
+ipkg = "mandelbrot.ipkg"
+test = "test/test.ipkg"
+
+[custom.all.mandelbrot-test]
+type = "local"
+path = "test"
+ipkg = "test.ipkg"
