@@ -8,3 +8,9 @@ test = "test/test.ipkg"
 type = "local"
 path = "test"
 ipkg = "test.ipkg"
+
+[custom.all.complex]
+type = "github"
+url  = "https://github.com/daniel-j-anderson-dev/complex_idris2.git"
+commit = "main"
+ipkg = "complex.ipkg"
