@@ -22,7 +22,6 @@ Cast (Fin n) Double where
 Cast (Fin height, Fin width) (Double, Double) where
   cast = finPairToDoublePair
 
-
 pixelToComplex :
   {imageHeight : Nat} ->
   {imageWidth  : Nat} ->
