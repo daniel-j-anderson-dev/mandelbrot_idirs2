@@ -7,33 +7,36 @@ import Complex
 finToDouble : Fin n -> Double
 finToDouble = cast . finToNat
 
-finPairToNatPair : (Fin height, Fin width) -> (Nat, Nat)
-finPairToNatPair = bimap finToNat finToNat
-
 finPairToDoublePair : (Fin height, Fin width) -> (Double, Double)
 finPairToDoublePair = bimap finToDouble finToDouble
 
-Cast (Fin height, Fin width) (Nat, Nat) where
-  cast = finPairToNatPair
+natPairToDoublePair : (Nat, Nat) -> (Double, Double)
+natPairToDoublePair = bimap cast cast
 
-Cast (Fin n) Double where
-  cast = finToDouble
+finPairToComplexDouble : (Fin height, Fin width) -> Complex Double
+finPairToComplexDouble = fromPair . finPairToDoublePair
 
-Cast (Fin height, Fin width) (Double, Double) where
-  cast = finPairToDoublePair
+natPairToComplexDouble : (Nat, Nat) -> Complex Double
+natPairToComplexDouble = fromPair . natPairToDoublePair
+
+Cast (Fin height, Fin width) (Complex Double) where
+  cast = finPairToComplexDouble
+
+Cast (Nat, Nat) (Complex Double) where
+  cast = natPairToComplexDouble
 
 pixelToComplex :
   {imageHeight : Nat} ->
   {imageWidth  : Nat} ->
-  Fin imageHeight ->
-  Fin imageWidth ->
-  Complex Double ->
-  Complex Double ->
-  Complex Double
-pixelToComplex pixelY pixelX topLeft bottomRight =
-  let pixel = map cast (finToNat pixelX :+ finToNat pixelY)
-      imageSize = map cast (imageWidth :+ imageHeight)
-      pixelPercent = elementWiseDivide pixel imageSize
-      planeSize = subtract bottomRight topLeft
-      offset = elementWiseMultiply planeSize pixelPercent
-  in  add topLeft offset
+  Fin imageHeight ->     -- row index
+  Fin imageWidth ->      -- column index
+  Complex Double ->      -- top left
+  Complex Double ->      -- bottom right
+  Complex Double         
+pixelToComplex row column topLeft bottomRight =
+  let pixel        = cast (column,     row)
+      imageSize    = cast (imageWidth, imageHeight)
+      pixelPercent = pixel       `componentWiseDivide`   imageSize
+      planeSize    = bottomRight `subtract`              topLeft
+      offset       = planeSize   `componentWiseMultiply` pixelPercent
+  in  topLeft `add` offset
