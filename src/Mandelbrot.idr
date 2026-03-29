@@ -61,3 +61,21 @@ escapeTime z0 f outOfBounds iterationMax = loop z0 0 where
       if outOfBounds z'
       then Just n
       else loop z' (n + 1)
+
+mandelbrotEscapeTimes :
+  (imageHeight : Nat) ->
+  (imageWidth  : Nat) ->
+  Complex Double -> -- top left of complex plane
+  Complex Double -> -- bottom right of complex plane
+  Nat ->            -- iteration max
+  Vect (imageHeight * imageWidth) (Maybe Nat)
+mandelbrotEscapeTimes imageHeight imageWidth topLeft bottomRight iterationMax =
+  map pixelToEscapeTime (allPixels imageHeight imageWidth)
+  where
+    pixelToEscapeTime : (Fin imageHeight, Fin imageWidth) -> Maybe Nat
+    pixelToEscapeTime (row, column) =
+      let c           = pixelToComplex topLeft bottomRight row column
+          z0          = (0.0 :+ 0.0)
+          f           = \z => (z `multiply` z) `add` c
+          outOfBounds = \z => normSquared z > 4
+      in  escapeTime z0 f outOfBounds iterationMax
