@@ -29,12 +29,12 @@ Cast (Nat, Nat) (Complex Double) where
 pixelToComplex :
   {imageHeight : Nat} ->
   {imageWidth  : Nat} ->
-  Fin imageHeight ->     -- row index
-  Fin imageWidth ->      -- column index
   Complex Double ->      -- top left
   Complex Double ->      -- bottom right
+  Fin imageHeight ->     -- row index
+  Fin imageWidth ->      -- column index
   Complex Double         
-pixelToComplex row column topLeft bottomRight =
+pixelToComplex topLeft bottomRight row column =
   let pixel        = cast (column,     row)
       imageSize    = cast (imageWidth, imageHeight)
       pixelPercent = pixel       `componentWiseDivide`   imageSize
@@ -45,3 +45,19 @@ pixelToComplex row column topLeft bottomRight =
 allPixels : (height : Nat) -> (width : Nat) -> Vect (height * width) (Fin height, Fin width)
 allPixels h w = concat (map (\i => map (\j => (i, j)) (allFins w)) (allFins h))
 
+escapeTime :
+  Complex Double ->                     -- z0
+  (Complex Double -> Complex Double) -> -- iterative equation to apply to f0
+  (Complex Double -> Bool) ->           -- escape condition
+  Nat ->                                -- iteration max
+  Maybe Nat                             -- escape iteration count
+escapeTime z0 f outOfBounds iterationMax = loop z0 0 where
+  loop : Complex Double -> Nat -> Maybe Nat
+  loop z n =
+    if n >= iterationMax
+    then Nothing
+    else
+      let z' = f z in
+      if outOfBounds z'
+      then Just n
+      else loop z' (n + 1)
