@@ -1,6 +1,7 @@
 module Mandelbrot
 
 import Data.Fin
+import Data.Vect
 
 import Complex
 
@@ -40,3 +41,7 @@ pixelToComplex row column topLeft bottomRight =
       planeSize    = bottomRight `subtract`              topLeft
       offset       = planeSize   `componentWiseMultiply` pixelPercent
   in  topLeft `add` offset
+
+allPixels : (height : Nat) -> (width : Nat) -> Vect (height * width) (Fin height, Fin width)
+allPixels h w = concat (map (\i => map (\j => (i, j)) (allFins w)) (allFins h))
+
